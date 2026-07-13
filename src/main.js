@@ -1,7 +1,7 @@
 
 // прототип геймплея
 
-options.__soundDisabled = 0; 
+options.__soundDisabled = 0;
 
 var level
     , rubber
@@ -37,10 +37,12 @@ function relImpactSpeed(bodyA, bodyB) {
     return v.__length();
 }
 
-function addBreakBlock(x, y, velocity){
+function addBreakBlock(x, y, velocity) {
+    var s = randomFloat(25, 35);
     var breack_block = level.__addChildBox({
-        __img: 'break_' + randomInt(1, 9),
+        __img: 'new_break_' + randomInt(1, 9),
         __ofs: [x, y, -20],
+        __size: [s, s],
         __rotate: randomInt(0, 360),
         __physics: {
             __isStatic: false,
@@ -53,8 +55,8 @@ function addBreakBlock(x, y, velocity){
         }
     });
     looperPost(a => {
-        if (breack_block.__ph_body){ 
-            ph_Body.setVelocity(breack_block.__ph_body, new Vector2(velocity.x + randomFloat(-10, 10),velocity.y + randomFloat(-8, 3)));
+        if (breack_block.__ph_body) {
+            ph_Body.setVelocity(breack_block.__ph_body, new Vector2(velocity.x + randomFloat(-10, 10), velocity.y + randomFloat(-8, 3)));
             _setTimeout(() => {
                 if (breack_block.__ph_body) {
                     initCollision(breack_block.__ph_body, breack_block, 50);
@@ -62,36 +64,35 @@ function addBreakBlock(x, y, velocity){
                         if (!breack_block.__destructed) {
                             removeBlock(breack_block);
                         }
-                    }, randomFloat(5, 10));
+                    }, randomFloat(.5, 2));
                 }
             }, 1);
         }
     });
 }
 
-function awakeBlocks(){
+function awakeBlocks() {
 
     $each(blocks, b => {
         b.__ph_awake();
     });
 }
 
-function removeBlock(block){
+function removeBlock(block) {
     removeFromArray(block, blocks);
     var size = block.__size, v = block.__ph_body.velocity;
 
     block.__removeFromParent();
 
     looperPostOne(awakeBlocks);
-    
-    
+
     if (block.__needBreaks) {
-        
-        playSound('break_' + randomInt(1, 4), 0, 0, 0.5);
-        
+
+        playSound('new_break_' + randomInt(1, 4), 0, 0, 0.5);
+
         var step = 50,
-            bx = block.__x - size.x/2, 
-            by = block.__y - size.y/2;
+            bx = block.__x - size.x / 2,
+            by = block.__y - size.y / 2;
 
         // todo: не учитывается вращение блока
         for (var x = 0; x < size.x; x += step) {
@@ -108,13 +109,13 @@ function removeBlock(block){
         }
     } else {
         if (random() > 0.5 && !windowManager.__hasOpenedWindow()) {
-            playSound('break_' + randomInt(1, 4), 0, 0, 0.5);
+            playSound('new_break_' + randomInt(1, 4), 0, 0, 0.5);
         }
     }
 
 }
 
-function initCollision(body, node, hp){
+function initCollision(body, node, hp) {
     blocks.push(node);
     body.__hp = hp;
     body.__onCollision = (speed) => {
@@ -142,7 +143,9 @@ function show_win() {
         wnd.__setAliasesData({
 
             button: {
-                __onTap(){
+                __onTap() {
+                    wnd.__close();
+                    restartLevel();
                     // todo: стартовать другой уровень?
                     consoleLog("not implemented")
                 },
@@ -154,7 +157,32 @@ function show_win() {
 
 }
 
-function initLevel(){
+function initCollisionHandler() {
+    if (ph_Events.__collisionBounds) return;
+    ph_Events.on(ph_Engine, 'collisionStart', (event) => {
+        var pairs = event.pairs, i, pair, bodyA, bodyB, speed;
+        for (i = 0; i < pairs.length; i++) {
+            pair = pairs[i];
+            bodyA = pair.bodyA;
+            bodyB = pair.bodyB;
+            speed = relImpactSpeed(bodyA, bodyB);
+
+            if (bodyA && bodyA.__onCollision) bodyA.__onCollision(speed);
+            if (bodyB && bodyB.__onCollision) bodyB.__onCollision(speed);
+        }
+    });
+}
+
+function restartLevel() {
+    if (level) level.__removeFromParent();
+
+    blocks.length = 0;
+    big_blocks = 0;
+
+    initLevel();
+}
+
+function initLevel() {
 
     // добавляем первый уровень на сцену
     level = scene
@@ -187,7 +215,7 @@ function initLevel(){
                     var wp = this.__worldPosition
                         , bullet = level.__addChildBox({
                             __effect: 'tail',
-                            __img: 'circle1',
+                            __img: 'ball',
                             __size: [28, 28],
                             __ofs: [wp.x, wp.y, -20],
                             __physics: {
@@ -219,19 +247,21 @@ function initLevel(){
     _setTimeout(a => {
         level.update(1);
 
-        // настраиваем коллизии для отработки повреждения блоков
-        ph_Events.on(ph_Engine, 'collisionStart', (event) => {
-            var pairs = event.pairs, i, pair, bodyA, bodyB, speed;
-            for (i = 0; i < pairs.length; i++) {
-                pair = pairs[i];
-                bodyA = pair.bodyA;
-                bodyB = pair.bodyB;
-                speed = relImpactSpeed(bodyA, bodyB);
+        initCollisionHandler();
 
-                if (bodyA && bodyA.__onCollision) bodyA.__onCollision(speed);
-                if (bodyB && bodyB.__onCollision) bodyB.__onCollision(speed);
-            }
-        });
+        // // настраиваем коллизии для отработки повреждения блоков
+        // ph_Events.on(ph_Engine, 'collisionStart', (event) => {
+        //     var pairs = event.pairs, i, pair, bodyA, bodyB, speed;
+        //     for (i = 0; i < pairs.length; i++) {
+        //         pair = pairs[i];
+        //         bodyA = pair.bodyA;
+        //         bodyB = pair.bodyB;
+        //         speed = relImpactSpeed(bodyA, bodyB);
+
+        //         if (bodyA && bodyA.__onCollision) bodyA.__onCollision(speed);
+        //         if (bodyB && bodyB.__onCollision) bodyB.__onCollision(speed);
+        //     }
+        // });
 
         // проходим по уровню и инициализируем блоки
         level.__traverse(node => {
