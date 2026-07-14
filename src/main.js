@@ -56,10 +56,11 @@ function addBreakBlock(x, y, velocity) {
     });
     looperPost(a => {
         if (breack_block.__ph_body) {
-            ph_Body.setVelocity(breack_block.__ph_body, new Vector2(velocity.x + randomFloat(-10, 10), velocity.y + randomFloat(-8, 3)));
+            //ph_Body.setVelocity(breack_block.__ph_body, new Vector2(velocity.x + randomFloat(-10, 10), velocity.y + randomFloat(-8, 3)));
+            ph_Body.setVelocity(breack_block.__ph_body, new Vector2(randomFloat(-3, 3), randomFloat(-3, 1)));
             _setTimeout(() => {
                 if (breack_block.__ph_body) {
-                    initCollision(breack_block.__ph_body, breack_block, 50);
+                    
                     _setTimeout(() => {
                         if (!breack_block.__destructed) {
                             removeBlock(breack_block);
@@ -91,13 +92,22 @@ function removeBlock(block) {
         playSound('new_break_' + randomInt(1, 4), 0, 0, 0.5);
 
         var step = 50,
-            bx = block.__x - size.x / 2,
-            by = block.__y - size.y / 2;
+            centerX = block.__x,
+            centerY = block.__y;
+            a = (block.__rotate || 0) * DEG2RAD;
+            sa = sin(a);
+            ca = cos(a);            
 
         // todo: не учитывается вращение блока
         for (var x = 0; x < size.x; x += step) {
             for (var y = 0; y < size.y; y += step) {
-                addBreakBlock(bx + x, by + y, v);
+                var localX =  x - size.x / 2 + step / 2;
+                var localY =  y - size.y / 2 + step / 2;
+
+                var worldX = centerX + localX * ca + localY * sa;
+                var worldY = centerY - localX * sa + localY * ca;
+
+                addBreakBlock(worldX, worldY, v);
             }
         }
 
@@ -119,7 +129,8 @@ function initCollision(body, node, hp) {
     blocks.push(node);
     body.__hp = hp;
     body.__onCollision = (speed) => {
-        var dmg = floor(clamp((speed - 1) * (speed - 2), 0, 100));
+        // урон мяча от скорости
+        var dmg = floor(clamp((speed - 3.5) * 10, 0, 100));
         if (dmg && body.__hp) {
             // consoleLog('damage', dmg);
             body.__hp = mmax(0, body.__hp - dmg);
@@ -199,7 +210,7 @@ function initLevel() {
                     // натягиваем резинку
                     var dmouse = this.__dmouse = this.__worldPosition.__clone().sub(new Vector2(x, y));
                     rubber.__parent.__rotate = -dmouse.__angle() * RAD2DEG;
-                    rubber.__width = dmouse.__length();
+                    rubber.__width =  Math.min(dmouse.__length() * 0.5, 150);
                 },
                 __dragStart() {
                     rubber.__killAllAnimations();
@@ -210,14 +221,14 @@ function initLevel() {
 
                     // отпускаем резинку
                     rubber.__anim({
-                        __width: 10
+                        __width: 50
                     }, 0.4, 0, easeElasticO);
-                    var wp = this.__worldPosition
+                    var wp = rubber.__worldPosition
                         , bullet = level.__addChildBox({
                             __effect: 'tail',
                             __img: 'ball',
                             __size: [28, 28],
-                            __ofs: [wp.x, wp.y, -20],
+                            __ofs: [wp.x, wp.y, -10],
                             __physics: {
                                 __isStatic: false,
                                 __friction: 130,
@@ -228,7 +239,7 @@ function initLevel() {
                                 __bodyType: 1
                             }
                         }).update()
-                        , velocity = this.__dmouse.__multiplyScalar(0.2);
+                        , velocity = this.__dmouse.__multiplyScalar(0.1);
 
                     if (bullet.__ph_body) {
                         ph_Body.setVelocity(bullet.__ph_body, velocity);

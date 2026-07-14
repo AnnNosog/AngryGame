@@ -27,38 +27,49 @@
           212,
           209
         ],
+        "__transformAnchor": false,
         "__ofs": [
-          93,
-          -54,
+          92,
+          -50,
           -15
         ],
         "__childs": {
           "_0": {
-            "__rotate": 3.9,
+            "__color": "#9c1515",
             "__size": [
-              25,
-              25
+              5,
+              8
             ],
             "__ofs": [
-              15,
-              -80
+              16,
+              -83
             ],
             "__childs": {
               "rubber": {
+                "__anchor": {
+                  "x": 0.5
+                },
+                "__rotate": 13,
                 "__img": "belt",
                 "sha": 2,
                 "sva": 1,
                 "__size": [
-                  148,
+                  56,
                   15
                 ],
-                "__x": -11
+                "__scalex": 1.7,
+                "__transformAnchor": true,
+                "__x": -5
               }
             }
           }
         }
       },
       "ph_world": {
+        "__anchor": {
+          "x": 1
+        },
+        "sha": 0.6000000000000001,
         "__size": [
           1,
           1

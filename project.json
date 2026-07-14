@@ -74,7 +74,19 @@
         ],
         [
             "image",
-            "sky.jpg"
+            "sky.png"
+        ],
+        [
+            "image",
+            "sky-day.png"
+        ],
+        [
+            "image",
+            "sky-night.png"
+        ],
+        [
+            "image",
+            "menu-win.png"
         ],
         [
             "effect",

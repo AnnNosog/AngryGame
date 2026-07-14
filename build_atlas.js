@@ -207,7 +207,13 @@ for(let i=0;i<total;i++){imgs[i].onload=()=>{loaded++;tick();};imgs[i].onerror=(
 async function main() {
   const browser = findBrowser();
 
-  const files = fs.readdirSync(IMG_DIR).filter(f => f.toLowerCase().endsWith('.png')).sort();
+  //const files = fs.readdirSync(IMG_DIR).filter(f => f.toLowerCase().endsWith('.png')).sort();
+  const SKIP = ['sky', 'sky-day', 'sky-night', 'menu-win'];
+  const files = fs.readdirSync(IMG_DIR)
+    .filter(f => f.toLowerCase().endsWith('.png'))
+    .filter(f => !SKIP.includes(path.basename(f, '.png')))
+    .sort();
+
   if (!files.length) { console.error('No png in img/'); process.exit(1); }
 
   let items = files.map(f => {
