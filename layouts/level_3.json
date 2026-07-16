@@ -9,7 +9,7 @@
     ],
     "__childs": {
       "sky": {
-        "__img": "sky.png",
+        "__img": "sky-day.png",
         "__size": [
           1486,
           779
@@ -69,7 +69,7 @@
         "__anchor": {
           "x": 1
         },
-        "sha": 0.6,
+        "sha": 0.6000000000000001,
         "__size": [
           1,
           1
@@ -91,8 +91,8 @@
               105
             ],
             "__ofs": [
-              291,
-              14
+              267,
+              -184
             ]
           },
           "ground": {
@@ -105,7 +105,7 @@
               "__density": 1,
               "__bodyType": 0
             },
-            "__img": "ground.png",
+            "__img": "ground-night.png",
             "__needScissor": false,
             "__size": [
               1405,
@@ -126,14 +126,39 @@
               "__density": 1,
               "__bodyType": 0
             },
+            "__rotate": 50,
             "__img": "new_block_4",
             "__ofs": [
-              290,
-              115,
+              163,
+              9,
               -7
             ]
           },
           "_3": {
+            "__physics": {
+              "__isStatic": false,
+              "__friction": 10,
+              "__frictionAir": 1,
+              "__frictionStatic": 50,
+              "__restitution": 0,
+              "__density": 1,
+              "__bodyType": 0
+            },
+            "__spacing": [
+              0,
+              3,
+              0,
+              0
+            ],
+            "__rotate": 118,
+            "__img": "new_block_4",
+            "__ofs": [
+              363,
+              13,
+              -7
+            ]
+          },
+          "_4": {
             "__physics": {
               "__isStatic": false,
               "__friction": 10,
@@ -149,11 +174,11 @@
               165
             ],
             "__ofs": [
-              173,
-              245
+              98,
+              230
             ]
           },
-          "_4": {
+          "_5": {
             "__physics": {
               "__isStatic": false,
               "__friction": 10,
@@ -173,7 +198,7 @@
               242
             ]
           },
-          "_5": {
+          "_6": {
             "__physics": {
               "__isStatic": false,
               "__friction": 10,
@@ -189,8 +214,8 @@
               126
             ],
             "__ofs": [
-              287,
-              227,
+              258,
+              252,
               -11
             ]
           },
@@ -204,7 +229,7 @@
               "__density": 1,
               "__bodyType": 0
             },
-            "__img": "wall1.png",
+            "__img": "wall-day.png",
             "__size": [
               216,
               862

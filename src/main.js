@@ -6,6 +6,10 @@ options.__soundDisabled = 0;
 var level
     , rubber
     , blocks = []
+    , shots = 0
+    , shotsLabel
+    , currentLevel = 1
+    , MAX_LEVEL = 3
     , big_blocks = 0;
 
 function looperPostOne(f, delay) {
@@ -28,8 +32,6 @@ function looperPostOne(f, delay) {
         };
     }
 }
-
-
 
 function relImpactSpeed(bodyA, bodyB) {
     var va = bodyA.velocity, vb = bodyB.velocity
@@ -60,7 +62,7 @@ function addBreakBlock(x, y, velocity) {
             ph_Body.setVelocity(breack_block.__ph_body, new Vector2(randomFloat(-3, 3), randomFloat(-3, 1)));
             _setTimeout(() => {
                 if (breack_block.__ph_body) {
-                    
+
                     _setTimeout(() => {
                         if (!breack_block.__destructed) {
                             removeBlock(breack_block);
@@ -94,15 +96,15 @@ function removeBlock(block) {
         var step = 50,
             centerX = block.__x,
             centerY = block.__y;
-            a = (block.__rotate || 0) * DEG2RAD;
-            sa = sin(a);
-            ca = cos(a);            
+        a = (block.__rotate || 0) * DEG2RAD;
+        sa = sin(a);
+        ca = cos(a);
 
         // todo: не учитывается вращение блока
         for (var x = 0; x < size.x; x += step) {
             for (var y = 0; y < size.y; y += step) {
-                var localX =  x - size.x / 2 + step / 2;
-                var localY =  y - size.y / 2 + step / 2;
+                var localX = x - size.x / 2 + step / 2;
+                var localY = y - size.y / 2 + step / 2;
 
                 var worldX = centerX + localX * ca + localY * sa;
                 var worldY = centerY - localX * sa + localY * ca;
@@ -114,7 +116,8 @@ function removeBlock(block) {
         big_blocks--;
         if (big_blocks == 0) {
             _setTimeout(() => {
-                show_win();
+                var stars = shots <= 3 ? 3 : shots <= 4 ? 2 : 1;
+                show_win(stars);
             }, 1);
         }
     } else {
@@ -145,24 +148,44 @@ function initCollision(body, node, hp) {
 }
 
 
-function show_win() {
+function show_win(stars) {
 
     playSound('win');
-
+    var isLast = currentLevel >= MAX_LEVEL;
     // todo: посчитать очки игрока и выдать звезды
     showWindow('win', wnd => {
+
+        var onRetry = function () {
+            wnd.__close();
+            restartLevel();
+        };
+
         wnd.__setAliasesData({
 
+            star_1: { __visible: stars >= 1 },
+            star_2: { __visible: stars >= 2 },
+            star_3: { __visible: stars >= 3 },
+
             button: {
+                __onTap: onRetry,
+                __onTapHighlight: 1,
+                __visible: !isLast
+            },
+
+            btn_finish_try: {
+                __onTap: onRetry,
+                __onTapHighlight: 1,
+                __visible: isLast
+            },
+
+            btn_next: {
                 __onTap() {
                     wnd.__close();
-                    restartLevel();
-                    // todo: стартовать другой уровень?
-                    consoleLog("not implemented")
+                    nextLevel();
                 },
-                __onTapHighlight: 1
+                __onTapHighlight: 1,
+                __visible: !isLast
             }
-
         })
     })
 
@@ -186,9 +209,14 @@ function initCollisionHandler() {
 
 function restartLevel() {
     if (level) level.__removeFromParent();
+    if (shotsLabel) {
+        shotsLabel.__removeFromParent();
+        shotsLabel = 0;
+    };
 
     blocks.length = 0;
     big_blocks = 0;
+    shots = 0;
 
     initLevel();
 }
@@ -197,7 +225,7 @@ function initLevel() {
 
     // добавляем первый уровень на сцену
     level = scene
-        .__addChildBox('level_1')
+        .__addChildBox('level_' + currentLevel)
         .__setAliasesData({
 
             rubber(node) {
@@ -210,13 +238,15 @@ function initLevel() {
                     // натягиваем резинку
                     var dmouse = this.__dmouse = this.__worldPosition.__clone().sub(new Vector2(x, y));
                     rubber.__parent.__rotate = -dmouse.__angle() * RAD2DEG;
-                    rubber.__width =  Math.min(dmouse.__length() * 0.5, 150);
+                    rubber.__width = Math.min(dmouse.__length() * 0.5, 150);
                 },
                 __dragStart() {
                     rubber.__killAllAnimations();
                 },
                 __dragEnd() {
 
+                    shots++;
+                    updateShotsLabel();
                     playSound('punch');
 
                     // отпускаем резинку
@@ -259,20 +289,7 @@ function initLevel() {
         level.update(1);
 
         initCollisionHandler();
-
-        // // настраиваем коллизии для отработки повреждения блоков
-        // ph_Events.on(ph_Engine, 'collisionStart', (event) => {
-        //     var pairs = event.pairs, i, pair, bodyA, bodyB, speed;
-        //     for (i = 0; i < pairs.length; i++) {
-        //         pair = pairs[i];
-        //         bodyA = pair.bodyA;
-        //         bodyB = pair.bodyB;
-        //         speed = relImpactSpeed(bodyA, bodyB);
-
-        //         if (bodyA && bodyA.__onCollision) bodyA.__onCollision(speed);
-        //         if (bodyB && bodyB.__onCollision) bodyB.__onCollision(speed);
-        //     }
-        // });
+        updateShotsLabel();
 
         // проходим по уровню и инициализируем блоки
         level.__traverse(node => {
@@ -285,6 +302,31 @@ function initLevel() {
         });
 
     }, 0.01);
+}
+
+function updateShotsLabel() {
+    if (!shotsLabel) {
+        shotsLabel = scene.__addChildBox({
+            sva: 0,
+            sha: 1,
+            __ofs: [0, 20, -5],
+            __size: [400, 60],
+            __text: {
+                __fontsize: 44,
+                __text: ''
+            }
+        });
+    }
+    shotsLabel.__text.__text = 'Shots: ' + shots;
+}
+
+function nextLevel() {
+    currentLevel++;
+    if (currentLevel > MAX_LEVEL) {
+        currentLevel = 1;
+    }
+
+    restartLevel();
 }
 
 
