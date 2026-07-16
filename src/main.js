@@ -5,6 +5,8 @@ options.__soundDisabled = 0;
 
 var level
     , rubber
+    , ball
+    , fader
     , blocks = []
     , shots = 0
     , shotsLabel
@@ -96,9 +98,9 @@ function removeBlock(block) {
         var step = 50,
             centerX = block.__x,
             centerY = block.__y;
-        a = (block.__rotate || 0) * DEG2RAD;
-        sa = sin(a);
-        ca = cos(a);
+        var a = (block.__rotate || 0) * DEG2RAD;
+        var sa = sin(a);
+        var ca = cos(a);
 
         // todo: не учитывается вращение блока
         for (var x = 0; x < size.x; x += step) {
@@ -116,7 +118,7 @@ function removeBlock(block) {
         big_blocks--;
         if (big_blocks == 0) {
             _setTimeout(() => {
-                var stars = shots <= 3 ? 3 : shots <= 4 ? 2 : 1;
+                var stars = shots <= 3 ? 3 : shots <= 5 ? 2 : 1;
                 show_win(stars);
             }, 1);
         }
@@ -147,7 +149,6 @@ function initCollision(body, node, hp) {
     }
 }
 
-
 function show_win(stars) {
 
     playSound('win');
@@ -157,7 +158,7 @@ function show_win(stars) {
 
         var onRetry = function () {
             wnd.__close();
-            restartLevel();
+            transitionTo(restartLevel);
         };
 
         wnd.__setAliasesData({
@@ -181,7 +182,7 @@ function show_win(stars) {
             btn_next: {
                 __onTap() {
                     wnd.__close();
-                    nextLevel();
+                    transitionTo(nextLevel);
                 },
                 __onTapHighlight: 1,
                 __visible: !isLast
@@ -193,6 +194,7 @@ function show_win(stars) {
 
 function initCollisionHandler() {
     if (ph_Events.__collisionBounds) return;
+    ph_Events.__collisionBounds = 1;
     ph_Events.on(ph_Engine, 'collisionStart', (event) => {
         var pairs = event.pairs, i, pair, bodyA, bodyB, speed;
         for (i = 0; i < pairs.length; i++) {
@@ -221,6 +223,34 @@ function restartLevel() {
     initLevel();
 }
 
+function addFaderToLevel(alpha) {
+    fader = level.__addChildBox({
+        __color: 0,
+        __alpha: alpha,
+        sha: 1,
+        sva: 1,
+        __size: [3000, 2000],
+        __ofs: [0, 0, -9000]
+    });
+
+    fader.update(1);
+}
+
+function transitionTo(action) {
+    addFaderToLevel(1);
+    fader.__anim({ __alpha: 1 }, 0.15, 0, easeQuadIO);
+
+    _setTimeout(() => {
+        action();
+        addFaderToLevel(1);
+
+        _setTimeout(() => {
+            fader.__anim({ __alpha: 0 }, .15, 0, easeQuadIO);
+        }, .1);
+
+    }, 0.1);
+}
+
 function initLevel() {
 
     // добавляем первый уровень на сцену
@@ -232,13 +262,19 @@ function initLevel() {
                 rubber = node;
             },
 
+            ball(node) {
+                ball = node;
+            },
+
             userInputArea: {
                 __dragDist: 1,
                 __drag(x, y, dx, dy) {
                     // натягиваем резинку
                     var dmouse = this.__dmouse = this.__worldPosition.__clone().sub(new Vector2(x, y));
                     rubber.__parent.__rotate = -dmouse.__angle() * RAD2DEG;
-                    rubber.__width = Math.min(dmouse.__length() * 0.5, 150);
+                    rubber.__width = Math.min(dmouse.__length() * 0.5, 100);
+
+                    ball.__x = -rubber.__width + 7;
                 },
                 __dragStart() {
                     rubber.__killAllAnimations();
@@ -249,9 +285,16 @@ function initLevel() {
                     updateShotsLabel();
                     playSound('punch');
 
+                    ball.__visible = false;
+
+                    _setTimeout(() => {
+                        ball.__x = 0;
+                        ball.__visible = true;
+                    }, .4);
+
                     // отпускаем резинку
                     rubber.__anim({
-                        __width: 50
+                        __width: 7
                     }, 0.4, 0, easeElasticO);
                     var wp = rubber.__worldPosition
                         , bullet = level.__addChildBox({
@@ -269,7 +312,7 @@ function initLevel() {
                                 __bodyType: 1
                             }
                         }).update()
-                        , velocity = this.__dmouse.__multiplyScalar(0.1);
+                        , velocity = this.__dmouse.__multiplyScalar(0.15);
 
                     if (bullet.__ph_body) {
                         ph_Body.setVelocity(bullet.__ph_body, velocity);
@@ -283,7 +326,6 @@ function initLevel() {
                 }
             }
         });
-
 
     _setTimeout(a => {
         level.update(1);
@@ -326,7 +368,7 @@ function nextLevel() {
         currentLevel = 1;
     }
 
-    restartLevel();
+    transitionTo(restartLevel);
 }
 
 

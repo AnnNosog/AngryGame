@@ -4,7 +4,7 @@
       "__angleMod": 2,
       "__geometryMod": 1,
       "duration": 0.3,
-      "texture": "circle1",
+      "texture": "ball",
       "lifespan": [
         0.3,
         0

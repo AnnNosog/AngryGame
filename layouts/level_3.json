@@ -12,7 +12,7 @@
         "__img": "sky-day.png",
         "__size": [
           1486,
-          779
+          730
         ],
         "__ofs": [
           -5,
@@ -20,11 +20,11 @@
         ]
       },
       "userInputArea": {
-        "__img": "catapult.png",
+        "__img": "catapult-day.png",
         "sha": 0,
         "sva": 2,
         "__size": [
-          212,
+          171,
           209
         ],
         "__transformAnchor": false,
@@ -35,31 +35,59 @@
         ],
         "__childs": {
           "_0": {
-            "__color": "#9c1515",
+            "__alpha": 0,
             "__size": [
               5,
               8
             ],
             "__ofs": [
-              16,
-              -83
+              6,
+              -79
             ],
             "__childs": {
+              "pin": {
+                "__img": "pin",
+                "__size": [
+                  6,
+                  6
+                ],
+                "__ofs": [
+                  -4,
+                  1,
+                  -1
+                ]
+              },
               "rubber": {
                 "__anchor": {
                   "x": 0.5
                 },
-                "__rotate": 13,
-                "__img": "belt",
+                "__rotate": 25,
+                "__img": "rubber-dark",
                 "sha": 2,
                 "sva": 1,
                 "__size": [
-                  56,
-                  15
+                  7,
+                  11
                 ],
                 "__scalex": 1.7,
                 "__transformAnchor": true,
-                "__x": -5
+                "__x": -3,
+                "__childs": {
+                  "_0": {
+                    "__margin": 0,
+                    "__img": "ball",
+                    "__size": [
+                      11,
+                      16
+                    ],
+                    "__transformAnchor": false,
+                    "__ofs": [
+                      -1,
+                      -4,
+                      1
+                    ]
+                  }
+                }
               }
             }
           }
@@ -105,7 +133,7 @@
               "__density": 1,
               "__bodyType": 0
             },
-            "__img": "ground-night.png",
+            "__img": "ground-day.png",
             "__needScissor": false,
             "__size": [
               1405,
