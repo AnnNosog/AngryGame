@@ -1,12 +1,10 @@
 [
   {
     "name": "win",
-    "__alphaDeep": 0,
     "__size": [
       1234,
       768
     ],
-    "__scaleF": 0,
     "__ofs": [
       -16,
       -19
@@ -14,28 +12,7 @@
     "__keyframes": {
       "loop": 0,
       "__loopDisabled": 1,
-      "__track": {
-        "__transform": {
-          "0": [
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "17": [
-            0,
-            0,
-            1,
-            1,
-            0
-          ]
-        },
-        "__alphaDeep": {
-          "0": 0,
-          "10": 1
-        }
-      }
+      "__track": {}
     },
     "__childs": {
       "blocker": {
@@ -53,6 +30,7 @@
           443,
           461
         ],
+        "__scaleF": 0,
         "__keyframes": {
           "loop": 0,
           "__loopDisabled": 1,
@@ -94,6 +72,7 @@
               92,
               79
             ],
+            "__scaleF": 0,
             "__ofs": [
               -123,
               28
@@ -279,7 +258,7 @@
             "__scaleF": 0,
             "__text": {
               "__fontsize": 18,
-              "__text": "NEXT"
+              "__text": "next"
             },
             "__ofs": [
               76,
@@ -364,7 +343,7 @@
             ],
             "__text": {
               "__fontsize": 18,
-              "__text": "TRY AGAIN"
+              "__text": "try_again"
             },
             "__y": 4,
             "__keyframes": {

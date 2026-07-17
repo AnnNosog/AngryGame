@@ -156,9 +156,21 @@ function show_win(stars) {
     // todo: посчитать очки игрока и выдать звезды
     showWindow('win', wnd => {
 
+        wnd.__closeAnimation = function () {
+            wnd.__anim({ sva: 0.6, sha: 0.6 }, 0.2, 0, easeBackI);
+            wnd.__anim({ __alphaDeep: 0 }, 0.2, 0, easeQuadIO);
+
+            _setTimeout(() => {
+                wnd.__realClose();
+            }, 0.2)
+        }
+
         var onRetry = function () {
             wnd.__close();
             transitionTo(restartLevel);
+            // _setTimeout(() => {
+            //     transitionTo(restartLevel);
+            // }, 0.1)
         };
 
         wnd.__setAliasesData({
@@ -237,18 +249,18 @@ function addFaderToLevel(alpha) {
 }
 
 function transitionTo(action) {
-    addFaderToLevel(1);
-    fader.__anim({ __alpha: 1 }, 0.15, 0, easeQuadIO);
+    addFaderToLevel(0);
+    fader.__anim({ __alpha: 1 }, 0.2, 0, easeQuadIO);
 
     _setTimeout(() => {
         action();
         addFaderToLevel(1);
 
         _setTimeout(() => {
-            fader.__anim({ __alpha: 0 }, .15, 0, easeQuadIO);
+            fader.__anim({ __alpha: 0 }, .2, 0, easeQuadIO);
         }, .1);
 
-    }, 0.1);
+    }, 0.2);
 }
 
 function initLevel() {
@@ -348,7 +360,7 @@ function initLevel() {
 
 function updateShotsLabel() {
     if (!shotsLabel) {
-        shotsLabel = scene.__addChildBox({
+        shotsLabel = level.__addChildBox({
             sva: 0,
             sha: 1,
             __ofs: [0, 20, -5],
