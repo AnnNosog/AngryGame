@@ -106,26 +106,6 @@
           1
         ],
         "__childs": {
-          "_0": {
-            "__physics": {
-              "__isStatic": false,
-              "__friction": 10,
-              "__frictionAir": 1,
-              "__frictionStatic": 50,
-              "__restitution": 0,
-              "__density": 1,
-              "__bodyType": 0
-            },
-            "__img": "new_block_1",
-            "__size": [
-              105,
-              105
-            ],
-            "__ofs": [
-              267,
-              -184
-            ]
-          },
           "ground": {
             "__physics": {
               "__isStatic": true,
@@ -147,109 +127,6 @@
               366
             ]
           },
-          "_2": {
-            "__physics": {
-              "__isStatic": false,
-              "__friction": 10,
-              "__frictionAir": 1,
-              "__frictionStatic": 50,
-              "__restitution": 0,
-              "__density": 1,
-              "__bodyType": 0
-            },
-            "__rotate": 50,
-            "__img": "new_block_4",
-            "__ofs": [
-              163,
-              9,
-              -7
-            ]
-          },
-          "_3": {
-            "__physics": {
-              "__isStatic": false,
-              "__friction": 10,
-              "__frictionAir": 1,
-              "__frictionStatic": 50,
-              "__restitution": 0,
-              "__density": 1,
-              "__bodyType": 0
-            },
-            "__spacing": [
-              0,
-              3,
-              0,
-              0
-            ],
-            "__rotate": 118,
-            "__img": "new_block_4",
-            "__ofs": [
-              363,
-              13,
-              -7
-            ]
-          },
-          "_4": {
-            "__physics": {
-              "__isStatic": false,
-              "__friction": 10,
-              "__frictionAir": 1,
-              "__frictionStatic": 50,
-              "__restitution": 0,
-              "__density": 1,
-              "__bodyType": 0
-            },
-            "__img": "new_block_3",
-            "__size": [
-              80,
-              165
-            ],
-            "__ofs": [
-              98,
-              230
-            ]
-          },
-          "_5": {
-            "__physics": {
-              "__isStatic": false,
-              "__friction": 10,
-              "__frictionAir": 1,
-              "__frictionStatic": 50,
-              "__restitution": 0,
-              "__density": 1,
-              "__bodyType": 0
-            },
-            "__img": "new_block_3",
-            "__size": [
-              80,
-              165
-            ],
-            "__ofs": [
-              408,
-              242
-            ]
-          },
-          "_6": {
-            "__physics": {
-              "__isStatic": false,
-              "__friction": 10,
-              "__frictionAir": 1,
-              "__frictionStatic": 50,
-              "__restitution": 0,
-              "__density": 1,
-              "__bodyType": 1
-            },
-            "__img": "new_block_5",
-            "__size": [
-              126,
-              126
-            ],
-            "__ofs": [
-              258,
-              252,
-              -11
-            ]
-          },
           "wall": {
             "__physics": {
               "__isStatic": true,
@@ -268,6 +145,146 @@
             "__ofs": [
               578,
               -90
+            ]
+          },
+          "_2": {
+            "__physics": {
+              "__isStatic": false,
+              "__friction": 10,
+              "__frictionAir": 1,
+              "__frictionStatic": 50,
+              "__restitution": 0,
+              "__density": 1,
+              "__bodyType": 0
+            },
+            "__img": "new_block_1",
+            "__size": [
+              105,
+              105
+            ],
+            "__ofs": [
+              204,
+              -62
+            ]
+          },
+          "_3": {
+            "__physics": {
+              "__isStatic": false,
+              "__friction": 10,
+              "__frictionAir": 1,
+              "__frictionStatic": 50,
+              "__restitution": 0,
+              "__density": 1,
+              "__bodyType": 0
+            },
+            "__img": "new_block_1",
+            "__size": [
+              105,
+              105
+            ],
+            "__ofs": [
+              403,
+              -61
+            ]
+          },
+          "_4": {
+            "__physics": {
+              "__isStatic": false,
+              "__friction": 10,
+              "__frictionAir": 1,
+              "__frictionStatic": 50,
+              "__restitution": 0,
+              "__density": 1,
+              "__bodyType": 0
+            },
+            "__img": "new_block_1",
+            "__size": [
+              105,
+              105
+            ],
+            "__ofs": [
+              304,
+              -164
+            ]
+          },
+          "_5": {
+            "__physics": {
+              "__isStatic": false,
+              "__friction": 10,
+              "__frictionAir": 1,
+              "__frictionStatic": 50,
+              "__restitution": 0,
+              "__density": 1,
+              "__bodyType": 0
+            },
+            "__img": "new_block_4",
+            "__ofs": [
+              303,
+              31,
+              -7
+            ]
+          },
+          "_6": {
+            "__physics": {
+              "__isStatic": false,
+              "__friction": 10,
+              "__frictionAir": 1,
+              "__frictionStatic": 50,
+              "__restitution": 0,
+              "__density": 1,
+              "__bodyType": 0
+            },
+            "__spacing": [
+              0,
+              3,
+              0,
+              0
+            ],
+            "__img": "new_block_4",
+            "__ofs": [
+              302,
+              277,
+              -7
+            ]
+          },
+          "_7": {
+            "__physics": {
+              "__isStatic": false,
+              "__friction": 10,
+              "__frictionAir": 1,
+              "__frictionStatic": 50,
+              "__restitution": 0,
+              "__density": 1,
+              "__bodyType": 0
+            },
+            "__img": "new_block_3",
+            "__size": [
+              80,
+              165
+            ],
+            "__ofs": [
+              191,
+              154
+            ]
+          },
+          "_8": {
+            "__physics": {
+              "__isStatic": false,
+              "__friction": 10,
+              "__frictionAir": 1,
+              "__frictionStatic": 50,
+              "__restitution": 0,
+              "__density": 1,
+              "__bodyType": 0
+            },
+            "__img": "new_block_3",
+            "__size": [
+              80,
+              165
+            ],
+            "__ofs": [
+              412,
+              154
             ]
           }
         }
