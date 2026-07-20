@@ -29,6 +29,7 @@
         ],
         "src/": [
             "loading.js",
+            "config.js",
             "main.js"
         ],
         "../../eeditor/plugins/": [
@@ -45,7 +46,7 @@
             "ru"
         ],
         "__defaultTextProperties": {
-            "__fontface": "Roboto_Thin"
+            "__fontface": "Comfortaa_Bold"
         },
         "__upscaleResolution": {
             "x": 1234,
@@ -95,7 +96,8 @@
         [
             "font",
             [
-                "Roboto-Thin"
+                "Roboto-Thin",
+                "Comfortaa-Bold"
             ]
         ],
         [

@@ -7,11 +7,13 @@ var level
     , rubber
     , ball
     , fader
+    , boost
     , blocks = []
     , shots = 0
     , shotsLabel
     , currentLevel = 1
     , MAX_LEVEL = 3
+    , aimDots = []
     , big_blocks = 0;
 
 function looperPostOne(f, delay) {
@@ -42,34 +44,31 @@ function relImpactSpeed(bodyA, bodyB) {
 }
 
 function addBreakBlock(x, y, velocity) {
-    var s = randomFloat(25, 35);
-    var breack_block = level.__addChildBox({
+    var s = randomFloat(SHARD_SIZE_MIN, SHARD_SIZE_MAX);
+    var break_block = level.__addChildBox({
         __img: 'new_break_' + randomInt(1, 9),
         __ofs: [x, y, -20],
         __size: [s, s],
         __rotate: randomInt(0, 360),
-        __physics: {
-            __isStatic: false,
-            __friction: 10,
-            __frictionAir: 1,
-            __frictionStatic: 50,
-            __restitution: 0,
-            __density: 1,
-            __bodyType: 1
-        }
+        __physics: SHARD_PHYSICS
     });
     looperPost(a => {
-        if (breack_block.__ph_body) {
-            //ph_Body.setVelocity(breack_block.__ph_body, new Vector2(velocity.x + randomFloat(-10, 10), velocity.y + randomFloat(-8, 3)));
-            ph_Body.setVelocity(breack_block.__ph_body, new Vector2(randomFloat(-3, 3), randomFloat(-3, 1)));
+        if (break_block.__ph_body) {
+            //выключаем столкновения осколков, но сохраняем разлёт
+            break_block.__ph_body.collisionFilter.mask = 0;
+
+            ph_Body.setVelocity(break_block.__ph_body, new Vector2(
+                randomFloat(SHARD_VELOCITY_X[0], SHARD_VELOCITY_X[1]),
+                randomFloat(SHARD_VELOCITY_Y[0], SHARD_VELOCITY_Y[1]))
+            );
             _setTimeout(() => {
-                if (breack_block.__ph_body) {
+                if (break_block.__ph_body) {
 
                     _setTimeout(() => {
-                        if (!breack_block.__destructed) {
-                            removeBlock(breack_block);
+                        if (!break_block.__destructed) {
+                            removeBlock(break_block);
                         }
-                    }, randomFloat(.5, 2));
+                    }, randomFloat(SHARD_LIFETIME_MIN, SHARD_LIFETIME_MAX));
                 }
             }, 1);
         }
@@ -95,7 +94,7 @@ function removeBlock(block) {
 
         playSound('new_break_' + randomInt(1, 4), 0, 0, 0.5);
 
-        var step = 50,
+        var step = SHARD_STEP,
             centerX = block.__x,
             centerY = block.__y;
         var a = (block.__rotate || 0) * DEG2RAD;
@@ -118,7 +117,7 @@ function removeBlock(block) {
         big_blocks--;
         if (big_blocks == 0) {
             _setTimeout(() => {
-                var stars = shots <= 3 ? 3 : shots <= 5 ? 2 : 1;
+                var stars = calculateStars(currentLevel, shots);
                 show_win(stars);
             }, 1);
         }
@@ -127,7 +126,14 @@ function removeBlock(block) {
             playSound('new_break_' + randomInt(1, 4), 0, 0, 0.5);
         }
     }
+}
 
+// пороги STAR_THRESHOLDS для звёзд берём из config.js
+function calculateStars(levelNum, shotsCount) {
+    var thresholds = STAR_THRESHOLDS[levelNum] || DEFAULT_THRESHOLDS;
+    if (shotsCount <= thresholds[0]) return 3;
+    if (shotsCount <= thresholds[1]) return 2;
+    return 1;
 }
 
 function initCollision(body, node, hp) {
@@ -135,7 +141,7 @@ function initCollision(body, node, hp) {
     body.__hp = hp;
     body.__onCollision = (speed) => {
         // урон мяча от скорости
-        var dmg = floor(clamp((speed - 3.5) * 10, 0, 100));
+        var dmg = floor(clamp((speed - DMG_SPEED_THRESHOLD) * DMG_MULT, 0, DMG_MAX));
         if (dmg && body.__hp) {
             // consoleLog('damage', dmg);
             body.__hp = mmax(0, body.__hp - dmg);
@@ -278,6 +284,10 @@ function initLevel() {
                 ball = node;
             },
 
+            boost(node) {
+                boost = node;
+            },
+
             userInputArea: {
                 __dragDist: 1,
                 __drag(x, y, dx, dy) {
@@ -287,11 +297,20 @@ function initLevel() {
                     rubber.__width = Math.min(dmouse.__length() * 0.5, 100);
 
                     ball.__x = -rubber.__width + 7;
+
+                    var rubberPosition = rubber.__worldPosition;
+                    var predictedVel = dmouse.__clone().__multiplyScalar(BULLET_LAUNCH_POWER);
+                    updateAimDots(rubberPosition.x, rubberPosition.y, predictedVel);
                 },
                 __dragStart() {
                     rubber.__killAllAnimations();
                 },
                 __dragEnd() {
+
+                    // скрываем предполагаемую траекторию мяча
+                    for (let index = 0; index < aimDots.length; index++) {
+                        aimDots[index].__alpha = 0;
+                    }
 
                     shots++;
                     updateShotsLabel();
@@ -308,33 +327,9 @@ function initLevel() {
                     rubber.__anim({
                         __width: 7
                     }, 0.4, 0, easeElasticO);
-                    var wp = rubber.__worldPosition
-                        , bullet = level.__addChildBox({
-                            __effect: 'tail',
-                            __img: 'ball',
-                            __size: [28, 28],
-                            __ofs: [wp.x, wp.y, -10],
-                            __physics: {
-                                __isStatic: false,
-                                __friction: 130,
-                                __frictionAir: 0.2,
-                                __frictionStatic: 500,
-                                __restitution: 10,
-                                __density: 4,
-                                __bodyType: 1
-                            }
-                        }).update()
-                        , velocity = this.__dmouse.__multiplyScalar(0.15);
-
-                    if (bullet.__ph_body) {
-                        ph_Body.setVelocity(bullet.__ph_body, velocity);
-                    }
-
-                    // пуля исчезает через 2 сек
-                    _setTimeout(() => {
-                        bullet.__removeFromParent();
-                    }, 2);
-
+                    var wp = rubber.__worldPosition;
+                    var velocity = this.__dmouse.__multiplyScalar(BULLET_LAUNCH_POWER);
+                    createBullet(wp.x, wp.y, velocity, 1);
                 }
             }
         });
@@ -351,11 +346,106 @@ function initLevel() {
             if (body && !body.isStatic) { // this is block
                 node.__needBreaks = 1;
                 big_blocks++;
-                initCollision(body, node, 100);
+                initCollision(body, node, BLOCK_HP);
+
+                // усыпляем блоки, чтобы не дёргались от зазоров/нахлёстов при старте
+                node.__ph_sleep();
             }
         });
 
+        createAimDots();
+
     }, 0.01);
+}
+
+function createBullet(x, y, velocity, canBoost) {
+    var bullet = level.__addChildBox({
+        __effect: 'tail',
+        __img: 'ball',
+        __size: BULLET_SIZE,
+        __ofs: [x, y, -10],
+        __physics: BULLET_PHYSICS
+    }).update();
+
+    if (bullet.__ph_body) {
+        ph_Body.setVelocity(bullet.__ph_body, velocity);
+    }
+
+    if (boost && canBoost) {
+        // пролёт мяча через буст ловим проверкой дистанции каждый кадр
+        // не используем isSensor, так как плохо работает с большими скоростями (проскок между кадрами)
+        var boostChecker = () => {
+            if (!bullet.__ph_body || bullet.__boosted) return;
+
+            var bulletPosition = bullet.__worldPosition;
+            var boostPosition = boost.__worldPosition;
+            var dx = bulletPosition.x - boostPosition.x;
+            var dy = bulletPosition.y - boostPosition.y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < BOOST_RADIUS) {
+                bullet.__boosted = 1;
+                playSound('break_4');
+
+                var v = bullet.__ph_body.velocity;
+                ph_Body.setVelocity(
+                    bullet.__ph_body,
+                    new Vector2(v.x * BOOST_SPEED_MULT, v.y * BOOST_SPEED_MULT - BOOST_LIFT)
+                );
+
+                createBullet(
+                    boostPosition.x,
+                    boostPosition.y,
+                    new Vector2(v.x * BOOST_SPAWN_SPEED_MULT, v.y * BOOST_SPAWN_SPEED_MULT + BOOST_SPAWN_LIFT),
+                    0
+                );
+            }
+            else {
+                looperPost(boostChecker);
+            }
+        };
+        looperPost(boostChecker);
+    }
+
+    _setTimeout(() => {
+        bullet.__removeFromParent();
+    }, BULLET_LIFETIME);
+
+    return bullet;
+}
+
+// переиспользуем пул точек, прячем через альфу
+function createAimDots() {
+    aimDots = [];
+    for (let index = 0; index < AIM_DOTS_COUNT; index++) {
+        var dot = level.__addChildBox({
+            __img: 'ball',
+            __size: AIM_DOT_SIZE,
+            __ofs: [0, 0, -12],
+            __alpha: 0,
+            __physics: 0
+        });
+
+        aimDots.push(dot);
+    }
+}
+
+// из-за frictionAir траектория не парабола, поэтому считаем пошаговой симуляцией полёта мяча
+function updateAimDots(startX, startY, velocity) {
+
+    for (let index = 0; index < AIM_DOTS_COUNT; index++) {
+        for (let step = 0; step < AIM_STEPS_PER_DOT; step++) {
+            velocity.x *= (1 - AIM_FRICTION_AIR * AIM_FRICTION_FRAME);
+            velocity.y *= (1 - AIM_FRICTION_AIR * AIM_FRICTION_FRAME);
+            velocity.y += AIM_GRAVITY;
+            startX += velocity.x;
+            startY += velocity.y;
+        }
+        var dot = aimDots[index];
+        dot.__x = startX;
+        dot.__y = startY;
+        dot.__alpha = 0.6 - index * (0.5 / AIM_DOTS_COUNT);
+    }
 }
 
 function updateShotsLabel() {
@@ -371,7 +461,7 @@ function updateShotsLabel() {
             }
         });
     }
-    shotsLabel.__text.__text = 'Shots: ' + shots;
+    shotsLabel.__text.__text = TR('shots_title', shots);
 }
 
 function nextLevel() {
@@ -382,7 +472,6 @@ function nextLevel() {
 
     transitionTo(restartLevel);
 }
-
 
 BUS.__addEventListener(
     __ON_GAME_LOADED, a => {
