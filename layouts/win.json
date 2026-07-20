@@ -26,6 +26,8 @@
       },
       "menu": {
         "__img": "menu-win.png",
+        "sha": 1,
+        "sva": 1,
         "__size": [
           443,
           461
@@ -151,6 +153,7 @@
               92,
               79
             ],
+            "__scaleF": 0,
             "__ofs": [
               104,
               28
@@ -189,10 +192,6 @@
         }
       },
       "title": {
-        "__fitImg": {
-          "x": -0.8,
-          "y": 0
-        },
         "sva": 0.9,
         "__size": [
           302,
@@ -201,14 +200,11 @@
         "__scaleF": 0,
         "__text": {
           "__color": 0,
-          "__fontsize": 67,
-          "__text": "You Win!",
+          "__fontsize": 60,
+          "__text": "win_title",
           "__autoscale": 1,
           "__autowrap": 1,
-          "__fontWeight": 2,
-          "__shadow": [
-            1
-          ]
+          "__symbol_align": 0
         },
         "__ofs": [
           -3,
@@ -251,6 +247,12 @@
         "__childs": {
           "btn_next": {
             "__img": "btn_2",
+            "__padding": [
+              5,
+              20,
+              0,
+              20
+            ],
             "__size": [
               145,
               65
@@ -258,7 +260,9 @@
             "__scaleF": 0,
             "__text": {
               "__fontsize": 18,
-              "__text": "next"
+              "__text": "next",
+              "__autoscale": 1,
+              "__autowrap": 1
             },
             "__ofs": [
               76,
@@ -290,6 +294,12 @@
           },
           "button": {
             "__img": "btn_1",
+            "__padding": [
+              5,
+              20,
+              0,
+              20
+            ],
             "sva": 1.3,
             "__corner": [
               11,
@@ -336,6 +346,12 @@
           },
           "btn_finish_try": {
             "__img": "btn_3",
+            "__padding": [
+              5,
+              0,
+              0,
+              0
+            ],
             "__visible": 0,
             "__size": [
               240,

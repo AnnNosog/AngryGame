@@ -4,5 +4,9 @@
     "try_again",
     "TRY AGAIN",
     "next",
-    "NEXT"
+    "NEXT",
+    "win_title",
+    "YOU WIN!",
+    "shots_title",
+    "Shots: {0}"
 ]
