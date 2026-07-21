@@ -14,6 +14,7 @@ var level
     , currentLevel = 1
     , MAX_LEVEL = 3
     , aimDots = []
+    , bullets = []
     , big_blocks = 0;
 
 function looperPostOne(f, delay) {
@@ -43,36 +44,28 @@ function relImpactSpeed(bodyA, bodyB) {
     return v.__length();
 }
 
-function addBreakBlock(x, y, velocity) {
+function addBreakBlock(x, y) {
     var s = randomFloat(SHARD_SIZE_MIN, SHARD_SIZE_MAX);
     var break_block = level.__addChildBox({
         __img: 'new_break_' + randomInt(1, 9),
         __ofs: [x, y, -20],
         __size: [s, s],
         __rotate: randomInt(0, 360),
-        __physics: SHARD_PHYSICS
     });
-    looperPost(a => {
-        if (break_block.__ph_body) {
-            //выключаем столкновения осколков, но сохраняем разлёт
-            break_block.__ph_body.collisionFilter.mask = 0;
 
-            ph_Body.setVelocity(break_block.__ph_body, new Vector2(
-                randomFloat(SHARD_VELOCITY_X[0], SHARD_VELOCITY_X[1]),
-                randomFloat(SHARD_VELOCITY_Y[0], SHARD_VELOCITY_Y[1]))
-            );
-            _setTimeout(() => {
-                if (break_block.__ph_body) {
+    var life = randomFloat(SHARD_LIFETIME_MIN, SHARD_LIFETIME_MAX);
 
-                    _setTimeout(() => {
-                        if (!break_block.__destructed) {
-                            removeBlock(break_block);
-                        }
-                    }, randomFloat(SHARD_LIFETIME_MIN, SHARD_LIFETIME_MAX));
-                }
-            }, 1);
-        }
-    });
+    // добавлена анимация, чтобы уйти от физики и возможных фризов при большом количестве осколков 
+    break_block.__anim({
+        __x: x + randomFloat(-80, 80),
+        __y: y + randomFloat(200, 400),
+        __rotate: break_block.__rotate + randomFloat(-120, 120),
+        __alpha: .3
+    }, life, 0, easeQuadI);
+
+    _setTimeout(() => {
+        if (!break_block.__destructed) break_block.__removeFromParent();
+    }, life);
 }
 
 function awakeBlocks() {
@@ -84,7 +77,7 @@ function awakeBlocks() {
 
 function removeBlock(block) {
     removeFromArray(block, blocks);
-    var size = block.__size, v = block.__ph_body.velocity;
+    var size = block.__size;
 
     block.__removeFromParent();
 
@@ -101,18 +94,30 @@ function removeBlock(block) {
         var sa = sin(a);
         var ca = cos(a);
 
+        var positions = [];
         // todo: не учитывается вращение блока
+        // update: учитывается вращение блока
         for (var x = 0; x < size.x; x += step) {
             for (var y = 0; y < size.y; y += step) {
                 var localX = x - size.x / 2 + step / 2;
                 var localY = y - size.y / 2 + step / 2;
 
-                var worldX = centerX + localX * ca + localY * sa;
-                var worldY = centerY - localX * sa + localY * ca;
-
-                addBreakBlock(worldX, worldY, v);
+                positions.push([
+                    centerX + localX * ca + localY * sa,
+                centerY - localX * sa + localY * ca
+                ]);
             }
         }
+
+        var i = 0;
+        var spawnChunk = () => {
+            var n = Math.min(i + SHARD_PER_FRAME, positions.length);
+            for (; i < n; i++) {
+                addBreakBlock(positions[i][0], positions[i][1]);
+            }
+            if (i < positions.length) looperPost(spawnChunk);
+        };
+        spawnChunk();
 
         big_blocks--;
         if (big_blocks == 0) {
@@ -160,6 +165,7 @@ function show_win(stars) {
     playSound('win');
     var isLast = currentLevel >= MAX_LEVEL;
     // todo: посчитать очки игрока и выдать звезды
+    // update: подсчитываем до в calculateStars и передаём уже в этот метод 
     showWindow('win', wnd => {
 
         wnd.__closeAnimation = function () {
@@ -174,9 +180,6 @@ function show_win(stars) {
         var onRetry = function () {
             wnd.__close();
             transitionTo(restartLevel);
-            // _setTimeout(() => {
-            //     transitionTo(restartLevel);
-            // }, 0.1)
         };
 
         wnd.__setAliasesData({
@@ -235,6 +238,7 @@ function restartLevel() {
     };
 
     blocks.length = 0;
+    bullets.length = 0;
     big_blocks = 0;
     shots = 0;
 
@@ -359,6 +363,11 @@ function initLevel() {
 }
 
 function createBullet(x, y, velocity, canBoost) {
+    while (bullets.length >= MAX_BULLETS) {
+        var old = bullets.shift();
+        if (old && !old.__destructed) old.__removeFromParent();
+    };
+
     var bullet = level.__addChildBox({
         __effect: 'tail',
         __img: 'ball',
@@ -366,6 +375,8 @@ function createBullet(x, y, velocity, canBoost) {
         __ofs: [x, y, -10],
         __physics: BULLET_PHYSICS
     }).update();
+
+    bullets.push(bullet);
 
     if (bullet.__ph_body) {
         ph_Body.setVelocity(bullet.__ph_body, velocity);
@@ -408,6 +419,7 @@ function createBullet(x, y, velocity, canBoost) {
     }
 
     _setTimeout(() => {
+        removeFromArray(bullet, bullets);
         bullet.__removeFromParent();
     }, BULLET_LIFETIME);
 

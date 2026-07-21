@@ -18,6 +18,7 @@ var BULLET_PHYSICS = {
     __density: 4,
     __bodyType: 1
 };
+var MAX_BULLETS = 3;
 
 var BOOST_RADIUS = 34;
 var BOOST_SPEED_MULT = 1.8;
@@ -41,15 +42,5 @@ var SHARD_STEP = 50;
 var SHARD_SIZE_MIN = 25;
 var SHARD_SIZE_MAX = 35;
 var SHARD_LIFETIME_MIN = 0.5;
-var SHARD_LIFETIME_MAX = 2;
-var SHARD_VELOCITY_X = [-3, 3];
-var SHARD_VELOCITY_Y = [-3, 1];
-var SHARD_PHYSICS = {
-    __isStatic: false,
-    __friction: 10,
-    __frictionAir: 1,
-    __frictionStatic: 50,
-    __restitution: 0,
-    __density: 1,
-    __bodyType: 1
-};
+var SHARD_LIFETIME_MAX = 1.5;
+var SHARD_PER_FRAME = 12;
