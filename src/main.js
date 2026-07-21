@@ -385,7 +385,7 @@ function createBullet(x, y, velocity, canBoost) {
 
             if (dist < BOOST_RADIUS) {
                 bullet.__boosted = 1;
-                playSound('break_4');
+                playSound('boost');
 
                 var v = bullet.__ph_body.velocity;
                 ph_Body.setVelocity(

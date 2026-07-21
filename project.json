@@ -166,6 +166,10 @@
                     "layouts/*.json",
                     "fonts/*.*",
                     "vfx/*",
+                    "img/sky.png",
+                    "img/sky-day.png",
+                    "img/sky-night.png",
+                    "img/menu-win.png",
                     "build_res/*.json",
                     "build_res/*.png",
                     "build_res/*.mp3"
