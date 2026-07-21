@@ -29,7 +29,14 @@
         ],
         "src/": [
             "loading.js",
-            "config.js",
+            "config.js", 
+            "state.js",           
+            "blocks.js",
+            "bullet.js",
+            "scoring.js",
+            "shards.js",
+            "level.js",
+            "win.js",
             "main.js"
         ],
         "../../eeditor/plugins/": [
